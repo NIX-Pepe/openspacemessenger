@@ -1,0 +1,6 @@
+.project
+.classpath
+/lib
+/ContactList.xml
+/bin
+.settings

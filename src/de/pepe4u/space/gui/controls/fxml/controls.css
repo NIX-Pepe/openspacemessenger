@@ -1,0 +1,8 @@
+
+.list-cell-highlighted {
+	-fx-background-color: #00BFFF;
+}
+
+.list-cell-not-highlighted {
+	-fx-background-color: rgba(0,0,0,0);
+}

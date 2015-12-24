@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pepe4u.space.gui.controls.UserListCellController">
+   <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+   </rowConstraints>
+   <children>
+      <ImageView fx:id="imageIcon" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true" GridPane.rowSpan="2" />
+      <Label fx:id="labelUser" prefHeight="25.0" prefWidth="134.0" GridPane.columnIndex="1" />
+      <Label fx:id="labelStatus" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="1">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Label>
+   </children>
+</GridPane>
