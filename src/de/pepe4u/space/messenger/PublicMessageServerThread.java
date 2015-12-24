@@ -4,6 +4,13 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+/**
+ * Creates a socket and waits for udp packets containing keep alive informations.
+ * 
+ * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ * @author Philipp Neuser <info@pepe-4u.de>
+ *
+ */
 public class PublicMessageServerThread extends Thread {
 	
 

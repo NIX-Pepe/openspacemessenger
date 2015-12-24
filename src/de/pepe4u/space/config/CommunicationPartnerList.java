@@ -7,6 +7,13 @@ import org.simpleframework.xml.Root;
 
 import de.pepe4u.space.dto.CommunicationPartner;
 
+/**
+ * DTO Object for saving contact list
+ * 
+ * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ * @author Philipp Neuser <info@pepe-4u.de>
+ *
+ */
 @Root
 public class CommunicationPartnerList {
 

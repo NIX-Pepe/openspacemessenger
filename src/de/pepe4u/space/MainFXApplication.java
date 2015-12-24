@@ -19,6 +19,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+
+/**
+ * Main Class for application bootstrapping
+ * 
+ * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ * @author Philipp Neuser <info@pepe-4u.de>
+ *
+ */
 public class MainFXApplication extends Application {
 	
 	private static final int UDP_PORT = 15668;
@@ -98,13 +106,6 @@ public class MainFXApplication extends Application {
 
 	@Override
 	public void start(Stage arg0) throws Exception {
-		/*MainStageControl mainstage = new MainStageControl();
-		Stage stage = new Stage();
-		stage.setScene(new Scene(mainstage));
-		stage.setTitle("Custom Control");
-		stage.setWidth(300);
-		stage.setHeight(200);
-		stage.show();*/
 		
 		this.bootstrapMessageServices();
 		

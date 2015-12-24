@@ -4,6 +4,13 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
+/**
+ * Works on the actual socket to a client and processes message
+ * 
+ * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ * @author Philipp Neuser <info@pepe-4u.de>
+ *
+ */
 public class DirectMessageServerWorkerThread extends Thread {
 
 	private Socket s;

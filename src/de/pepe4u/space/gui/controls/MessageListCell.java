@@ -7,6 +7,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.ListCell;
 
+/**
+ * Custom list cell for messages
+ *   
+ * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ * @author Philipp Neuser <info@pepe-4u.de>
+ *
+ */
 public class MessageListCell extends ListCell<CommunicationMessage> {
 	@Override
 	protected void updateItem(CommunicationMessage item, boolean empty) {

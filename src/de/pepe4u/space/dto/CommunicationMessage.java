@@ -2,6 +2,13 @@ package de.pepe4u.space.dto;
 
 import java.util.Date;
 
+/**
+ * DTO for messages
+ * 
+ * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ * @author Philipp Neuser <info@pepe-4u.de>
+ *
+ */
 public class CommunicationMessage {
 	
 	private CommunicationPartner partner;

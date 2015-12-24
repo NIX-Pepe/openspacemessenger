@@ -6,6 +6,13 @@ import java.util.List;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
+/**
+ * DTO for communication partners
+ * 
+ * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ * @author Philipp Neuser <info@pepe-4u.de>
+ *
+ */
 @Root
 public class CommunicationPartner {
 	

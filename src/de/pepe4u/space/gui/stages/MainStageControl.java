@@ -33,6 +33,13 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
+/**
+ * FX controller of main view
+ * 
+ * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ * @author Philipp Neuser <info@pepe-4u.de>
+ *
+ */
 public class MainStageControl extends Parent implements Initializable {
 
 	private CommunicationPartner currentComPartner;
@@ -71,26 +78,7 @@ public class MainStageControl extends Parent implements Initializable {
 	}
 	
 	public MainStageControl() {
-		listOfCommpartners = FXCollections.observableArrayList();
-		
-		/**
-		 * Testblock
-		 */
-/*		CommunicationPartner c = new CommunicationPartner();
-		c.setName("Test Philipp");
-		
-		c.setMessages(new ArrayList<CommunicationMessage>());
-		c.getMessages().add(createTestMessage("Test 12",c));
-		c.getMessages().add(createTestMessage("Test asdfl�asdkf�",c));
-		
-		CommunicationPartner c1 = new CommunicationPartner();
-		c1.setName("Test Philipp 2");
-		c1.setMessages(new ArrayList<CommunicationMessage>());
-		c1.getMessages().add(createTestMessage("Bl�h bBluasbdasdgasd",c));
-		c1.getMessages().add(createTestMessage("Hasse nicht gesehen, was ich hier mache oder?",c));
-		listOfCommpartners.add(c);
-		listOfCommpartners.add(c1);*/
-		
+		listOfCommpartners = FXCollections.observableArrayList();	
 	}
 	
 	@FXML

@@ -17,6 +17,15 @@ import java.util.List;
 import de.pepe4u.space.dto.CommunicationMessage;
 import de.pepe4u.space.dto.CommunicationPartner;
 
+/**
+ * This class is the heart of messenger service. It processes all incomming messages
+ * manages the neighborhood of currents instance and manages the process of sending messages
+ * to communication partners.
+ * 
+ * @license    GPL 2 (http://www.gnu.org/licenses/gpl.html)
+ * @author Philipp Neuser <info@pepe-4u.de>
+ *
+ */
 public class MessageManager {
 	public static final int MESSAGE_DEFAULT_TTL = 7;
 	
