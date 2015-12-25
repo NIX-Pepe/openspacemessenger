@@ -48,6 +48,7 @@ public class MessageManager {
 		myContacts = new ArrayList<CommunicationPartner>();
 		myNeighborhood = new ArrayList<CommunicationPartner>();
 		receivedMessages = new ArrayList<CommunicationMessage>();
+		receivedStateChanges = new ArrayList<CommunicationPartner>();
 		receivedMessageIds = new ArrayList<Integer>();
 		messageCounter = 0L;
 		this.tcp_port = tcp_port;

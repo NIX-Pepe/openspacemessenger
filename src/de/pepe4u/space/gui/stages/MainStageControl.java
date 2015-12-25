@@ -152,6 +152,14 @@ public class MainStageControl extends Parent implements Initializable {
 		        ae -> processNewMessages()));
 		timelineMessages.setCycleCount(Animation.INDEFINITE);
 		timelineMessages.play();
+		
+		/**
+		 * Set timer for state changes
+		 */
+		timelineStateChanges = new Timeline(new KeyFrame(Duration.millis(5000), 
+				ae -> processStateChanges()));
+		timelineStateChanges.setCycleCount(Animation.INDEFINITE);
+		timelineStateChanges.play();
 	}
 	
 	@FXML
