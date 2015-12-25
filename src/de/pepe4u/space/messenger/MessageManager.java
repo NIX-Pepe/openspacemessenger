@@ -185,8 +185,8 @@ public class MessageManager {
 					{
 						CommunicationPartner cpStateChange = new CommunicationPartner();
 						cpStateChange.setName(contact.getName());
-						cpStateChange.setOnline(contact.isOnline());
-						cpStateChange.setLastSeen(contact.getLastSeen());
+						cpStateChange.setOnline(true);
+						cpStateChange.setLastSeen(new Date().getTime());
 						cpStateChange.setIp(src_ip);
 						addStateChange(cpStateChange);
 					}
@@ -220,7 +220,6 @@ public class MessageManager {
 								myNeighborhood.add(src);
 						}
 					}
-					
 				}
 			}
 		}catch(Exception e)
@@ -498,11 +497,11 @@ public class MessageManager {
 	 * @return
 	 */
 	public List<CommunicationPartner> getReceivedStateChanges() {
-		List<CommunicationPartner> lRet = new ArrayList<>();
+		List<CommunicationPartner> lRet = new ArrayList<CommunicationPartner>();
 		synchronized (lockReceivedStateChanges) {
 			lRet.addAll(receivedStateChanges);
 			receivedStateChanges.clear();
 		}
-		return receivedStateChanges;
+		return lRet;
 	}
 }

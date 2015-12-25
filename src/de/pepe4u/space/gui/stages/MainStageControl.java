@@ -306,14 +306,13 @@ public class MainStageControl extends Parent implements Initializable {
 					cpContact.setLastSeen(cpStateChange.getLastSeen());
 					cpContact.setIp(cpStateChange.getIp());
 					cpContact.setOnline(cpStateChange.isOnline());
-					break; // stop iteration
 				}
 			}
 			
 			/**
 			 * Check if last keep alive message is older than 30 seconds
 			 */
-			if(cpContact.isOnline() && (new Date().getTime() - 30L) > cpContact.getLastSeen())
+			if(cpContact.isOnline() && (new Date().getTime() - 30000L) > cpContact.getLastSeen())
 				cpContact.setOnline(false);
 			
 			/**
