@@ -61,7 +61,9 @@ public class MainStageControl extends Parent implements Initializable {
 	@FXML
 	private Label labelUser;
 	
-	private Timeline timeline;
+	private Timeline timelineMessages;
+	
+	private Timeline timelineStateChanges;
 	
 	@FXML
 	private Parent rootPane;
@@ -145,11 +147,11 @@ public class MainStageControl extends Parent implements Initializable {
 		/**
 		 * Set timer for message retrieval
 		 */
-		timeline = new Timeline(new KeyFrame(
+		timelineMessages = new Timeline(new KeyFrame(
 		        Duration.millis(2500),
 		        ae -> processNewMessages()));
-		timeline.setCycleCount(Animation.INDEFINITE);
-		timeline.play();
+		timelineMessages.setCycleCount(Animation.INDEFINITE);
+		timelineMessages.play();
 	}
 	
 	@FXML
@@ -165,8 +167,11 @@ public class MainStageControl extends Parent implements Initializable {
 		    CommunicationPartner cp = new CommunicationPartner();
 		    cp.setOnline(false);
 		    cp.setName(result.get());
-		    listOfCommpartners.add(cp);
-		    mm.addCommPartnerToContacts(cp);
+		    if(cp.getName() != null && !cp.getName().trim().isEmpty())
+		    {
+		    	listOfCommpartners.add(cp);
+		    	mm.addCommPartnerToContacts(cp);
+		    }
 		} 
 	}
 	
@@ -269,6 +274,44 @@ public class MainStageControl extends Parent implements Initializable {
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Processes state changes received from network managements
+	 */
+	private void processStateChanges()
+	{
+		/**
+		 * Get all state changes and iterate over changes
+		 */
+		List<CommunicationPartner> lReceivedStateChanges = mm.getReceivedStateChanges();
+		for(CommunicationPartner cpContact : listOfCommpartners)
+		{
+			for(CommunicationPartner cpStateChange : lReceivedStateChanges)
+			{
+				if(cpStateChange.getName() != null && cpStateChange.getName().toLowerCase().equals(cpContact.getName().toLowerCase()))
+				{
+					/**
+					 * Found a match, so start to copy states
+					 */
+					cpContact.setLastSeen(cpStateChange.getLastSeen());
+					cpContact.setIp(cpStateChange.getIp());
+					cpContact.setOnline(cpStateChange.isOnline());
+					break; // stop iteration
+				}
+			}
+			
+			/**
+			 * Check if last keep alive message is older than 30 seconds
+			 */
+			if(cpContact.isOnline() && (new Date().getTime() - 30L) > cpContact.getLastSeen())
+				cpContact.setOnline(false);
+			
+			/**
+			 * Update view
+			 */
+			listUser.fireEvent(new ListView.EditEvent<>(listUser, ListView.editCommitEvent(), cpContact, listUser.getItems().indexOf(cpContact)));
 		}
 	}
 }

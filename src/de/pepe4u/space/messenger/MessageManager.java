@@ -32,12 +32,14 @@ public class MessageManager {
 	private List<CommunicationPartner> myContacts;
 	private List<CommunicationPartner> myNeighborhood;
 	private List<CommunicationMessage> receivedMessages;
+	private List<CommunicationPartner> receivedStateChanges;
 	private int tcp_port;
 	private int udp_port;
 	private CommunicationPartner meAndMyself;
 	private List<Integer> receivedMessageIds;
 	private Object lockReceiveMessageIds;
 	private Object lockReceivedMessages;
+	private Object lockReceivedStateChanges;
 	private Object lockMyNeighborhood;
 	private Object lockMyContacts;
 	private long messageCounter;
@@ -54,6 +56,7 @@ public class MessageManager {
 		lockMyNeighborhood = new Object();
 		lockReceivedMessages = new Object();
 		lockReceiveMessageIds = new Object();
+		lockReceivedStateChanges =  new Object();
 		lockMyContacts = new Object();
 	}
 	
@@ -156,13 +159,13 @@ public class MessageManager {
 					if(!parts[4].toLowerCase().equals(meAndMyself.getName().toLowerCase()) && Integer.parseInt(parts[5])-1 > 0)
 					{
 						// Not at the end of time to life, let's forward the message
-						CommunicationPartner cp_src = new CommunicationPartner();
-						CommunicationPartner cp_target = new CommunicationPartner();
+						CommunicationPartner cpSrc = new CommunicationPartner();
+						CommunicationPartner cpTarget = new CommunicationPartner();
 
-						cp_src.setName(parts[3]);
-						cp_target.setName(parts[4]);
+						cpSrc.setName(parts[3]);
+						cpTarget.setName(parts[4]);
 
-						sendDirectMessageToCommPartner(cp_src, cp_target, Integer.parseInt(parts[5])-1, Long.parseLong(parts[1]), parts[6]);
+						sendDirectMessageToCommPartner(cpSrc, cpTarget, Integer.parseInt(parts[5])-1, Long.parseLong(parts[1]), parts[6]);
 					}
 				}
 				
@@ -179,9 +182,12 @@ public class MessageManager {
 					}
 					if(contact != null)
 					{
-						contact.setIp(src_ip);
-						contact.setOnline(true);
-						contact.setLastSeen(new Date().getTime());
+						CommunicationPartner cpStateChange = new CommunicationPartner();
+						cpStateChange.setName(contact.getName());
+						cpStateChange.setOnline(contact.isOnline());
+						cpStateChange.setLastSeen(contact.getLastSeen());
+						cpStateChange.setIp(src_ip);
+						addStateChange(cpStateChange);
 					}
 					
 					synchronized (lockMyNeighborhood) {
@@ -225,17 +231,17 @@ public class MessageManager {
 	
 	/**
 	 * Sends a Message to a CommPartner via target host
-	 * @param comP
-	 * @param target
+	 * @param cpMessageTarget
+	 * @param cpHostTarget
 	 * @param text
 	 * @return
 	 */
-	public boolean sendDirectMessageToCommPartner(CommunicationPartner cpSrc, CommunicationPartner comP, CommunicationPartner target, int ttl, long messageCnt, String text)
+	public boolean sendDirectMessageToCommPartner(CommunicationPartner cpSrc, CommunicationPartner cpMessageTarget, CommunicationPartner cpHostTarget, int ttl, long messageCnt, String text)
 	{
-		String telegramm = "D|"+messageCnt+"|"+new Date()+"|"+cpSrc.getName()+"|"+comP.getName()+"|"+ttl+"|"+text.replaceAll("\n", "").replaceAll("\\|", "");
+		String telegramm = "D|"+messageCnt+"|"+new Date()+"|"+cpSrc.getName()+"|"+cpMessageTarget.getName()+"|"+ttl+"|"+text.replaceAll("\n", "").replaceAll("\\|", "");
 		try {
 			Socket s = new Socket();
-			s.connect(new InetSocketAddress(target.getIp(),tcp_port),5000);
+			s.connect(new InetSocketAddress(cpHostTarget.getIp(),tcp_port),5000);
 			if(s.isConnected())
 			{
 				PrintWriter pw = new PrintWriter(s.getOutputStream());
@@ -246,11 +252,54 @@ public class MessageManager {
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
-			target.setOnline(false);
+			
+			setCommpartnerOffline(cpHostTarget);
 		} 
 		return false;
 	}
 	
+	/**
+	 * Sets the offline flag to a communication partner
+	 * @param cpHost
+	 */
+	private void setCommpartnerOffline(CommunicationPartner cpHost)
+	{
+		/**
+		 * Set neighbor offline
+		 */
+		synchronized (lockMyNeighborhood) {
+			for(CommunicationPartner cp: myNeighborhood)
+			{
+				if(cp.getName().equals(cpHost.getName()))
+					cp.setOnline(false);
+			}
+		}
+		
+		/**
+		 * Create state chane
+		 */
+		CommunicationPartner cpStateChange = new CommunicationPartner();
+		cpStateChange.setName(cpHost.getName());
+		cpStateChange.setIp(cpHost.getIp());
+		cpStateChange.setOnline(false);
+		cpStateChange.setLastSeen(cpHost.getLastSeen());
+		addStateChange(cpStateChange);
+	}
+	
+	/**
+	 * Adds a state change to the list of state changes
+	 * @param cpStateChange
+	 */
+	private void addStateChange(CommunicationPartner cpStateChange)
+	{
+		synchronized (lockReceivedStateChanges) {
+			receivedStateChanges.add(cpStateChange);
+		}
+	}
+	/**
+	 * Returns the current message number and increments the counter.
+	 * @return
+	 */
 	private synchronized long getMessageCount()
 	{
 		messageCounter += 1;
@@ -260,13 +309,13 @@ public class MessageManager {
 	/**
 	 * Trys to send a message directly to a communication partner. Is the partner not available directly, 
 	 * messages are distributed to the network.
-	 * @param comP
+	 * @param cpTarget
 	 * @param ttl
 	 * @param text
 	 */
-	public void sendDirectMessageToCommPartner(CommunicationPartner cpSrc,CommunicationPartner comP, int ttl, long messageCnt, String text)
+	public void sendDirectMessageToCommPartner(CommunicationPartner cpSrc,CommunicationPartner cpTarget, int ttl, long messageCnt, String text)
 	{
-		if(comP.getName().startsWith("#") || !sendDirectMessageToCommPartner(cpSrc,comP, comP, ttl, messageCnt, text))
+		if(cpTarget.getName().startsWith("#") || !sendDirectMessageToCommPartner(cpSrc,cpTarget, cpTarget, ttl, messageCnt, text))
 		{
 			List<CommunicationPartner> possibleTargets = new ArrayList<CommunicationPartner>();
 			synchronized (lockMyNeighborhood) {
@@ -274,7 +323,7 @@ public class MessageManager {
 			}
 			for(CommunicationPartner target : possibleTargets)
 			{
-				sendDirectMessageToCommPartner(cpSrc,comP, target, ttl, messageCnt, text);
+				sendDirectMessageToCommPartner(cpSrc,cpTarget, target, ttl, messageCnt, text);
 			}
 			removeOfflineNeighborhood();
 		}
@@ -282,19 +331,19 @@ public class MessageManager {
 	
 	/**
 	 * Sends a keep alive message to a target
-	 * @param src
-	 * @param target
+	 * @param cpSrc
+	 * @param cpTarget
 	 * @param ttl
 	 */
-	private void forwardKeepAliveMessage(CommunicationPartner src, CommunicationPartner target, int ttl)
+	private void forwardKeepAliveMessage(CommunicationPartner cpSrc, CommunicationPartner cpTarget, int ttl)
 	{
 		// Don't send with a ttl less than 1
 		if(ttl < 1)
 			return;
-		String telegramm = "K|"+ttl+"|"+src.getName();
+		String telegramm = "K|"+ttl+"|"+cpSrc.getName();
 		try{
 			DatagramPacket dp = new DatagramPacket(telegramm.getBytes(),telegramm.length());
-			dp.setAddress(InetAddress.getByName(target.getIp()));
+			dp.setAddress(InetAddress.getByName(cpTarget.getIp()));
 			dp.setPort(udp_port);
 			DatagramSocket socket = new DatagramSocket();
 			socket.send(dp);
@@ -302,7 +351,7 @@ public class MessageManager {
 		}catch(Exception e)
 		{
 			e.printStackTrace();
-			target.setOnline(false);
+			setCommpartnerOffline(cpTarget);
 		}
 		
 	}
@@ -394,12 +443,12 @@ public class MessageManager {
 	
 	/**
 	 * Send as message to given communication partner
-	 * @param comP
+	 * @param cpTarget
 	 * @param text
 	 */
-	public void sendDirectMessageToCommPartner(CommunicationPartner comP, String text)
+	public void sendDirectMessageToCommPartner(CommunicationPartner cpTarget, String text)
 	{
-		sendDirectMessageToCommPartner(meAndMyself,comP, MESSAGE_DEFAULT_TTL, getMessageCount(), text);
+		sendDirectMessageToCommPartner(meAndMyself,cpTarget, MESSAGE_DEFAULT_TTL, getMessageCount(), text);
 	}
 
 	/**
@@ -441,5 +490,18 @@ public class MessageManager {
 			if(del_tmp != null)
 				myContacts.remove(del_tmp);
 		}
+	}
+
+	/**
+	 * Returns all state changes and clears list...
+	 * @return
+	 */
+	public List<CommunicationPartner> getReceivedStateChanges() {
+		List<CommunicationPartner> lRet = new ArrayList<>();
+		synchronized (lockReceivedStateChanges) {
+			lRet.addAll(receivedStateChanges);
+			receivedStateChanges.clear();
+		}
+		return receivedStateChanges;
 	}
 }
