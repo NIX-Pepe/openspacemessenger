@@ -1,5 +1,5 @@
 # openspacemessenger
-AdHoc - Messenger for offices or conferences. Simply uses your Login as Nick and Supports #channels
+AdHoc - Messenger for offices or conferences. Simply uses your login credentials as nick and supports #channels
 
 Usage:
 Simply start the messenger. It is connected automatically to other hosts in your subnet. If you want to exchange messages with somebody, you need to add him to your contactlist and the other way round. If you want to create a channel or join a channel, simply add a contact with a leading "#".
