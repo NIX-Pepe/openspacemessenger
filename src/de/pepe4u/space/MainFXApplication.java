@@ -31,6 +31,7 @@ public class MainFXApplication extends Application {
 	
 	private static final int UDP_PORT = 15668;
 	private static final int TCP_PORT = 15669;
+	private static final String CONTACT_LIST_DIR = ".OpenSpaceMessenger";
 	private static final String CONTACT_LIST_FILE = "ContactList.xml";
 	
 	private MessageManager mm;
@@ -45,6 +46,30 @@ public class MainFXApplication extends Application {
 		cp.setName(System.getProperty("user.name"));
 		return cp;
 				
+	}
+	
+	/**
+	 * Returns the path to the contactlist file
+	 * @return
+	 */
+	private String getContactListFilePath()
+	{
+		/**
+		 * Get home dir for user
+		 */
+		String home_dir = System.getProperty("user.home");
+		if(home_dir == null || home_dir.isEmpty())
+			home_dir = "";
+		/**
+		 * Check if directory exists or create it
+		 */
+		File d = new File(home_dir+"/"+CONTACT_LIST_DIR);
+		if(!d.exists() || !d.isDirectory())
+			d.mkdir();
+		/**
+		 * Return filename
+		 */
+		return home_dir+"/"+CONTACT_LIST_DIR+"/"+CONTACT_LIST_FILE;
 	}
 	
 	/**
@@ -71,10 +96,17 @@ public class MainFXApplication extends Application {
 		}
 	}
 	
+	/**
+	 * Loads contactlist from xml-file
+	 */
 	private void loadContactList()
 	{
 		Serializer serializer = new Persister();
-		File source = new File(CONTACT_LIST_FILE);
+		
+		/**
+		 * Load contact list from home dir
+		 */
+		File source = new File(getContactListFilePath());
 
 		try {
 			CommunicationPartnerList cpl = serializer.read(CommunicationPartnerList.class, source);
@@ -88,13 +120,19 @@ public class MainFXApplication extends Application {
 		}
 	}
 	
+	/**
+	 * Saves contactlist to xml-file
+	 */
 	private void saveContactList()
-	{
+	{		
 		Serializer serializer = new Persister();
 		CommunicationPartnerList cpl = new CommunicationPartnerList();
 		cpl.setCommunicationPartnerList(new ArrayList<CommunicationPartner>());
 		cpl.getCommunicationPartnerList().addAll(msc.getListOfCommpartners());
-		File result = new File(CONTACT_LIST_FILE);
+		/**
+		 * Save contact list to home dir
+		 */
+		File result = new File(getContactListFilePath());
 
 		try {
 			serializer.write(cpl, result);
@@ -114,8 +152,8 @@ public class MainFXApplication extends Application {
 		Parent root = loader.load(getClass().getResource("gui/stages/fxml/mainstage.fxml").openStream());
 	    
         Scene scene = new Scene(root, 600, 500);
-    
-        stage.setTitle("openSpaceMessenger 1.0");
+        
+        stage.setTitle("openSpaceMessenger 2.0rc");
         stage.setScene(scene);
         
         // Shutdown threads when closing application

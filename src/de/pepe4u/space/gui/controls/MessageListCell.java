@@ -15,6 +15,20 @@ import javafx.scene.control.ListCell;
  *
  */
 public class MessageListCell extends ListCell<CommunicationMessage> {
+	
+	private Parent n;
+	private MessageListCellController c;
+	
+	public MessageListCell() {
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			n = loader.load(getClass().getResource("fxml/messagelistcell.fxml").openStream());		
+			c = (MessageListCellController)loader.getController();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@Override
 	protected void updateItem(CommunicationMessage item, boolean empty) {
 		super.updateItem(item, empty);
@@ -30,17 +44,13 @@ public class MessageListCell extends ListCell<CommunicationMessage> {
 	protected void setCellContent(CommunicationMessage comM)
 	{
 		try {
-			FXMLLoader loader = new FXMLLoader();
-			Parent n = loader.load(getClass().getResource("fxml/messagelistcell.fxml").openStream());
-			
-			MessageListCellController c = (MessageListCellController)loader.getController();
 			c.getLabelName().setText((comM.getChannelMember() != null ? comM.getChannelMember().getName() : comM.getPartner().getName())+" ("+comM.getDate()+")");
 			c.getTextMessage().setText(comM.getMessage());
 			
 			this.setGraphic(n);
 			//setText(comP.getName());
 			
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

@@ -6,6 +6,7 @@ import de.pepe4u.space.dto.CommunicationPartner;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.ListCell;
+import javafx.scene.image.Image;
 
 /**
  * Custom list cell for contact list
@@ -16,7 +17,20 @@ import javafx.scene.control.ListCell;
  */
 public class UserListCell extends ListCell<CommunicationPartner> {
 	
+	private Parent n;
+	private UserListCellController c;
+	
 	public UserListCell() {
+
+		try {
+		FXMLLoader loader = new FXMLLoader();
+		n = loader.load(getClass().getResource("fxml/userlistcell.fxml").openStream());
+		
+		c = (UserListCellController)loader.getController();
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -31,30 +45,86 @@ public class UserListCell extends ListCell<CommunicationPartner> {
 		}
 	}
 	
-	protected void setCellContent(CommunicationPartner comP)
+	/**
+	 * Fills the content of current cell
+	 * @param cp
+	 */
+	protected void setCellContent(CommunicationPartner cp)
 	{
 		try {
-			FXMLLoader loader = new FXMLLoader();
-			Parent n = loader.load(getClass().getResource("fxml/userlistcell.fxml").openStream());
-			
-			UserListCellController c = (UserListCellController)loader.getController();
-			if(comP.isNewMessageFlag())
-				c.getLabelUser().setText("*"+comP.getName()+"*");
+			/**
+			 * Highlight username when there is a new message
+			 */
+			if(cp.isNewMessageFlag())
+				c.getLabelUser().setText("*"+cp.getName()+"*");
 			else
-				c.getLabelUser().setText(comP.getName());
+				c.getLabelUser().setText(cp.getName());
 			
-			if(comP.isOnline())
-				c.getLabelStatus().setText("online");
+			/**
+			 * Set status text
+			 */
+			if(cp.isOnline())
+				c.getLabelStatus().setText("online");				
 			else
 				c.getLabelStatus().setText("offline");
-			if(comP.getName().startsWith("#"))
+			
+			/**
+			 * No text for channels, we don't know if 
+			 * somebody is online.
+			 */
+			if(cp.getName().startsWith("#"))
+			{
 				c.getLabelStatus().setText("");
+			}
+			
+			/**
+			 * Choose icon for buddy
+			 */
+			chooseImgForBuddy(cp, c);
 			
 			this.setGraphic(n);
-			//setText(comP.getName());
 			
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Chooses an image for the buddy and sets it
+	 * @param cp
+	 * @param c
+	 */
+	private void chooseImgForBuddy(CommunicationPartner cp, UserListCellController c)
+	{
+		/**
+		 * First check if comm-partner is a channel, then use channel images.
+		 * For channels there are only online and new message available, hence we
+		 * never know who is online in this channel.
+		 */
+		if(cp.getName().startsWith("#"))
+		{
+			if(cp.isNewMessageFlag())
+				c.getImageIcon().setImage(new Image(getClass().getResourceAsStream("/res/imgs/channel_newmessage.png")));
+			else
+				c.getImageIcon().setImage(new Image(getClass().getResourceAsStream("/res/imgs/channel.png")));
+			return;
+		}
+		
+		/**
+		 * Is there a new message, always show the image for new messages. 
+		 * Does not matter if the comm-partner has gone offline since.
+		 */
+		if(cp.isNewMessageFlag()){
+			c.getImageIcon().setImage(new Image(getClass().getResourceAsStream("/res/imgs/buddy_newmessage.png")));
+			return;
+		}
+		
+		/**
+		 * No channel, no new messages, so lets simply decide between on- and offline.
+		 */
+		if(cp.isOnline())
+			c.getImageIcon().setImage(new Image(getClass().getResourceAsStream("/res/imgs/buddy_online.png")));
+		else
+			c.getImageIcon().setImage(new Image(getClass().getResourceAsStream("/res/imgs/buddy_offline.png")));
 	}
 }

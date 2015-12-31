@@ -307,7 +307,7 @@ public class MessageManager {
 	}
 	
 	/**
-	 * Trys to send a message directly to a communication partner. Is the partner not available directly, 
+	 * Tries to send a message directly to a communication partner. Is the partner not available directly, 
 	 * messages are distributed to the network.
 	 * @param cpTarget
 	 * @param ttl
