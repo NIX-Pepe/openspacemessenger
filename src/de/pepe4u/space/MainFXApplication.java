@@ -14,10 +14,12 @@ import de.pepe4u.space.messenger.KeepAliveTrigger;
 import de.pepe4u.space.messenger.MessageManager;
 import de.pepe4u.space.messenger.PublicMessageServerThread;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 
 /**
@@ -157,7 +159,16 @@ public class MainFXApplication extends Application {
         stage.setScene(scene);
         
         // Shutdown threads when closing application
-        stage.setOnCloseRequest( ae -> {pmst.shutdownThread(); dmst.shutdownThread(); kat.shutdownThread(); saveContactList();});
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			
+			@Override
+			public void handle(WindowEvent event) {
+				pmst.shutdownThread(); 
+				dmst.shutdownThread(); 
+				kat.shutdownThread(); 
+				saveContactList();
+			}
+		});
         
         // Set message service:
         msc = (MainStageControl)loader.getController();

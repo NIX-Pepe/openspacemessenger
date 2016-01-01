@@ -1,7 +1,5 @@
 package de.pepe4u.space.gui.controls;
 
-import java.io.IOException;
-
 import de.pepe4u.space.dto.CommunicationMessage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

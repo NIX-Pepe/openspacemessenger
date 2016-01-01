@@ -3,15 +3,13 @@ package de.pepe4u.space.gui.stages;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
-
-import com.sun.org.apache.xml.internal.security.encryption.CipherReference;
 
 import de.pepe4u.space.dto.CommunicationMessage;
 import de.pepe4u.space.dto.CommunicationPartner;
 import de.pepe4u.space.gui.controls.MessageListCell;
 import de.pepe4u.space.gui.controls.UserListCell;
+import de.pepe4u.space.gui.dialogs.TextInputDialog;
 import de.pepe4u.space.messenger.MessageManager;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -20,6 +18,8 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -28,7 +28,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -149,7 +148,14 @@ public class MainStageControl extends Parent implements Initializable {
 		 */
 		timelineMessages = new Timeline(new KeyFrame(
 		        Duration.millis(2500),
-		        ae -> processNewMessages()));
+		        new EventHandler<ActionEvent>() {
+					
+					@Override
+					public void handle(ActionEvent event) {
+						processNewMessages();
+						
+					}
+				}));
 		timelineMessages.setCycleCount(Animation.INDEFINITE);
 		timelineMessages.play();
 		
@@ -157,7 +163,13 @@ public class MainStageControl extends Parent implements Initializable {
 		 * Set timer for state changes
 		 */
 		timelineStateChanges = new Timeline(new KeyFrame(Duration.millis(5000), 
-				ae -> processStateChanges()));
+				new EventHandler<ActionEvent>() {
+
+					@Override
+					public void handle(ActionEvent event) {
+						processStateChanges();
+					}
+				}));
 		timelineStateChanges.setCycleCount(Animation.INDEFINITE);
 		timelineStateChanges.play();
 	}
@@ -165,16 +177,16 @@ public class MainStageControl extends Parent implements Initializable {
 	@FXML
 	protected void handleAddCommPartner()
 	{
-		TextInputDialog dialog = new TextInputDialog("");
-		dialog.setTitle("Add CommPartner");
+		TextInputDialog dialog = new TextInputDialog("Add a user from your domain","Please enter username:", "Add CommPartner");
+		/*dialog.setTitle("Add CommPartner");
 		dialog.setHeaderText("Add a user from your domain");
-		dialog.setContentText("Please enter username:");
+		dialog.setContentText("Please enter username:");*/
 
-		Optional<String> result = dialog.showAndWait();
-		if (result.isPresent()){
+		String result = dialog.showTextInputDialog();
+		if (result != null && !result.trim().isEmpty()){
 		    CommunicationPartner cp = new CommunicationPartner();
 		    cp.setOnline(false);
-		    cp.setName(result.get());
+		    cp.setName(result);
 		    if(cp.getName() != null && !cp.getName().trim().isEmpty())
 		    {
 		    	listOfCommpartners.add(cp);
@@ -208,7 +220,7 @@ public class MainStageControl extends Parent implements Initializable {
 		{
 			currentComPartner.setNewMessageFlag(false);
 			if(oldValue != null && !oldValue.isDeleteFlag())
-				listUser.fireEvent(new ListView.EditEvent<>(listUser, ListView.editCommitEvent(), currentComPartner, listUser.getItems().indexOf(currentComPartner)));
+				listUser.fireEvent(new ListView.EditEvent<CommunicationPartner>(listUser, ListView.<CommunicationPartner>editCommitEvent(), currentComPartner, listUser.getItems().indexOf(currentComPartner)));
 		}
 		/**
 		 * Scroll to the end
@@ -267,7 +279,8 @@ public class MainStageControl extends Parent implements Initializable {
 								/**
 								 * Notify list about changes
 								 */
-								listUser.fireEvent(new ListView.EditEvent<>(listUser, ListView.editCommitEvent(), cp, listUser.getItems().indexOf(cp)));
+								//listUser.fireEvent(new ListView.EditEvent<>(listUser, ListView.editCommitEvent(), cp, listUser.getItems().indexOf(cp)));
+								listUser.fireEvent(new ListView.EditEvent<CommunicationPartner>(listUser, ListView.<CommunicationPartner>editCommitEvent(), cp, listUser.getItems().indexOf(cp)));
 								/**
 								 * Notify user by push messenger to front
 								 */
@@ -318,7 +331,7 @@ public class MainStageControl extends Parent implements Initializable {
 			/**
 			 * Update view
 			 */
-			listUser.fireEvent(new ListView.EditEvent<>(listUser, ListView.editCommitEvent(), cpContact, listUser.getItems().indexOf(cpContact)));
+			listUser.fireEvent(new ListView.EditEvent<CommunicationPartner>(listUser, ListView.<CommunicationPartner>editCommitEvent(), cpContact, listUser.getItems().indexOf(cpContact)));
 		}
 	}
 }
