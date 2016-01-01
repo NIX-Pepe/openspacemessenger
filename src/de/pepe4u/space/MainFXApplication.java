@@ -155,7 +155,7 @@ public class MainFXApplication extends Application {
 	    
         Scene scene = new Scene(root, 600, 500);
         
-        stage.setTitle("openSpaceMessenger 2.0rc");
+        stage.setTitle("openSpaceMessenger 2.0");
         stage.setScene(scene);
         
         // Shutdown threads when closing application
